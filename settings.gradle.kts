@@ -8,4 +8,4 @@
  */
 
 rootProject.name = "villagers"
-include("ai")
+include("game")

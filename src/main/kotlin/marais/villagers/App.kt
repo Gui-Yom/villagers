@@ -1,5 +1,7 @@
 package marais.villagers
 
+import marais.villagers.game.Game
+import marais.villagers.game.GameMap
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Frame
@@ -10,9 +12,10 @@ import kotlin.system.exitProcess
 class App {
 
     val frame = Frame("Villagers")
+    val renderer = Renderer(Game(GameMap(16, 16)))
 
     suspend fun run() {
-        frame.size = Dimension(800, 600)
+        frame.size = Dimension(400, 300)
         frame.addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) {
                 // Shutdown gracefully
@@ -20,6 +23,15 @@ class App {
             }
         })
         frame.layout = BorderLayout()
+        frame.add(renderer, BorderLayout.CENTER)
         frame.isVisible = true
+
+        /*
+        coroutineScope {
+            launch(Dispatchers.Main) {
+                println(Thread.currentThread().name)
+            }
+        }
+        */
     }
 }

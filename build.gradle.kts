@@ -9,6 +9,7 @@ subprojects {
     apply {
         plugin("org.jetbrains.kotlin.jvm")
         plugin("java-library")
+        plugin("org.jetbrains.kotlin.plugin.serialization")
     }
 }
 
@@ -50,8 +51,7 @@ dependencies {
     implementation(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-
-    implementation("marais:coroutines-awt:0.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 
@@ -59,7 +59,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
     implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
 
-    implementation(project(":ai"))
+    implementation(project(":game"))
 }
 
 application {
