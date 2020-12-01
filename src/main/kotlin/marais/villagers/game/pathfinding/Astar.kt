@@ -6,10 +6,14 @@ import java.util.*
 
 class Astar(val map: GameMap, val heuristic: Heuristic, val allowDiagonal: Boolean) : Pathfinder {
     override fun find_path(start: Position, target: Position): List<Position> {
+
+        if (start == target)
+            return listOf()
+
         // We sort positions based on the cost
-        val frontier = PriorityQueue(Comparator.comparingInt(Pair<Position, Int>::second))
-        frontier.add(start to 0)
-        val cost = mutableMapOf(start to 0)
+        val frontier = PriorityQueue(Comparator.comparing(Pair<Position, Float>::second))
+        frontier.add(start to 0f)
+        val cost = mutableMapOf(start to 0f)
         val visited = mutableSetOf<Position>()
 
         val parent = mutableMapOf<Position, Position>()

@@ -11,11 +11,15 @@ import kotlin.system.exitProcess
 
 class App {
 
+    init {
+        System.setProperty("sun.java2d.opengl", "true")
+    }
+
     val frame = Frame("Villagers")
-    val renderer = Renderer(Game(GameMap(16, 16)))
+    val renderer = Renderer(Game(GameMap(64, 64)))
 
     suspend fun run() {
-        frame.size = Dimension(400, 300)
+        frame.size = Dimension(512, 512)
         frame.addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) {
                 // Shutdown gracefully

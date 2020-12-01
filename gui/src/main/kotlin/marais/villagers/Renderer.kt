@@ -10,7 +10,6 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
 class Renderer(val game: Game) : Canvas() {
-
     init {
         val handler = object : MouseAdapter() {
 
@@ -35,7 +34,7 @@ class Renderer(val game: Game) : Canvas() {
                     else if (button == MouseEvent.BUTTON3)
                         game.map[pos] = Tile.EMPTY
 
-                    game.recalc_path()
+                    game.recalcPath()
                     repaint()
                 }
             }
@@ -50,22 +49,29 @@ class Renderer(val game: Game) : Canvas() {
         addKeyListener(object : KeyAdapter() {
             override fun keyTyped(e: KeyEvent) {
                 if (e.keyChar == 'a') {
-                    game.recalc_path()
+                    game.recalcPath()
                     repaint()
                 }
             }
         })
     }
 
+    /**
+     * Fuck awt
+     */
+    override fun update(g: Graphics?) {
+        paint(g)
+    }
+
     override fun paint(g: Graphics?) {
         if (bufferStrategy == null)
-            createBufferStrategy(2)
+            createBufferStrategy(2, BufferCapabilities(ImageCapabilities(true), ImageCapabilities(true), BufferCapabilities.FlipContents.BACKGROUND))
         val g2d = bufferStrategy.drawGraphics as Graphics2D
         //val g2d = g as Graphics2D
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
 
-        g2d.clearRect(0, 0, width, height)
+        //g2d.clearRect(0, 0, width, height)
 
         val cellWidth = width / game.map.width
         val cellHeight = height / game.map.height

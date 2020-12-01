@@ -43,13 +43,13 @@ class GameMap(val width: Int, val height: Int) {
      *
      * @return the cost to go from pos1 to pos2
      */
-    fun cost(pos1: Position, pos2: Position): Int = this[pos2].cost
+    fun cost(pos1: Position, pos2: Position): Float = this[pos2].cost
 }
 
-enum class Tile(val cost: Int) {
-    EMPTY(1),
-    WALL(-1),
-    SAND(3);
+enum class Tile(val cost: Float) {
+    EMPTY(1f),
+    WALL(-1f),
+    SAND(3f);
 
     fun isTraversable() = cost >= 0
 }
