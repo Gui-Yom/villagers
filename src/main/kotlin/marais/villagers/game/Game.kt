@@ -1,17 +1,11 @@
 package marais.villagers.game
 
 import marais.villagers.game.pathfinding.Astar
-import marais.villagers.game.pathfinding.DefaultHeuristic
+import marais.villagers.game.pathfinding.Heuristic
 
-class Game(val map: GameMap) {
+class Game(val map: GameMap, allowDiagonal: Boolean, h: Heuristic) {
     val playerPos = Position(0, 0)
-    val targetPos = Position(50, 50)
-    val allowDiagonal = false
-    val pathfinder = Astar(map, DefaultHeuristic, allowDiagonal)
-
-    var currPath = pathfinder.find_path(playerPos, targetPos)
-
-    fun recalcPath() {
-        currPath = pathfinder.find_path(playerPos, targetPos)
-    }
+    val targetPos = Position(28, 28)
+    val pathfinder = Astar(map, h, allowDiagonal, playerPos, targetPos)
+    var step: Long = 500
 }

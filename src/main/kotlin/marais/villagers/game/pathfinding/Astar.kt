@@ -4,58 +4,109 @@ import marais.villagers.game.GameMap
 import marais.villagers.game.Position
 import java.util.*
 
-class Astar(val map: GameMap, val heuristic: Heuristic, val allowDiagonal: Boolean) : Pathfinder {
-    override fun find_path(start: Position, target: Position): List<Position> {
+// TODO thread safe because its currently the big oof when handling UI events
+class Astar(
+    private val map: GameMap,
+    var heuristic: Heuristic,
+    var allowDiagonal: Boolean,
+    val start: Position,
+    val target: Position
+) : Pathfinder {
 
+    override var path: List<Position>? = null
+
+    init {
+        // The Programmer
         if (start == target)
-            return listOf()
+            path = emptyList()
+    }
 
-        // We sort positions based on the cost
-        val frontier = PriorityQueue(Comparator.comparing(Pair<Position, Float>::second))
+    var current: Position? = null
+
+    // We sort positions based on the cost
+    var frontier = PriorityQueue(Comparator.comparing(Pair<Position, Float>::second))
+
+    // The explored map costs
+    var costs = mutableMapOf(start to 0f)
+
+    // TODO use bitset/bitvector
+    // visited nodes
+    var visited = mutableSetOf<Position>()
+
+    // the path as a series of edges in reverse order
+    var parent = mutableMapOf<Position, Position>()
+
+    init {
+        // The starting point is the first we should explore
         frontier.add(start to 0f)
-        val cost = mutableMapOf(start to 0f)
-        val visited = mutableSetOf<Position>()
+    }
 
-        val parent = mutableMapOf<Position, Position>()
+    override fun step() {
+        if (found) return
 
-        var current: Position? = null
-        while (frontier.isNotEmpty()) {
+        if (frontier.isNotEmpty()) {
             current = frontier.poll().first
 
-            if (current in visited)
-                continue
+            if (current in visited) {
+                // This isn't really a step if we just skip, so we run another round in this case
+                step()
+                return
+            }
 
-            visited.add(current)
+            // Finish line
+            if (current == target) {
+                path = edgeToNodes()
+                return
+            }
 
-            if (current == target)
-                break
+            visited.add(current!!)
 
-            /*
-            println("visited: $visited")
-            println("costs: $cost")
-            println("frontier: $frontier")
-
-             */
-
-            for (node in map.neighbors(current, allowDiagonal)) {
-                val newCost = cost[current]!! + map.cost(current, node)
-                if (node !in cost || newCost < cost[node]!!) {
-                    cost[node] = newCost
-                    frontier.add(node to newCost + heuristic(node, target))
-                    parent[node] = current
+            for (node in map.neighbors(current!!, allowDiagonal)) {
+                val newCost = costs[current]!! + map.cost(current!!, node)
+                if (node !in costs || newCost < costs[node]!!) {
+                    costs[node] = newCost
+                    frontier.add(node to (newCost + heuristic(map, node, target)))
+                    parent[node] = current!!
                 }
             }
+        } else if (current != target) {
+            path = emptyList()
         }
+    }
 
-        // No path
-        if (current == null || current != target)
-            return listOf()
+    override fun restartFrom(pos: Position) {
+        TODO("Not yet implemented")
+    }
 
+    override fun restart() {
+        path = null
+        current = null
+        // We sort positions based on the cost
+        frontier = PriorityQueue(Comparator.comparing(Pair<Position, Float>::second))
+        // The starting point is the first we should explore
+        frontier.add(start to 0f)
+        // The explored map costs
+        costs = mutableMapOf(start to 0f)
+        // visited nodes
+        visited = mutableSetOf()
+        // the path as a series of edges in reverse order
+        parent = mutableMapOf()
+    }
+
+    override fun findPath(): List<Position> {
+        while (!found)
+            step()
+        return path!!
+    }
+
+    /**
+     * Convert the series of edge to a list of nodes and reverse the path in the process.
+     */
+    private fun edgeToNodes(): List<Position> {
         val path = mutableListOf(target)
         while (path.last() != start) {
             path.add(parent[path.last()]!!)
         }
-
         return path.asReversed()
     }
 }

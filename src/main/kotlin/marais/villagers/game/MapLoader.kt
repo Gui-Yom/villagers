@@ -1,5 +1,3 @@
 package marais.villagers.game
 
-class VillageLoader {
-
-}
+class MapLoader
