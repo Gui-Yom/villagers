@@ -1,8 +1,15 @@
 package marais.villagers
 
+import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import marais.villagers.game.Actor
 import marais.villagers.game.Game
 import marais.villagers.game.GameMap
+import marais.villagers.game.Position
+import marais.villagers.game.pathfinding.Astar
 import marais.villagers.game.pathfinding.Heuristics
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -19,7 +26,10 @@ object Main {
     }
 
     val map = GameMap(32, 32)
-    val game = Game(map, true, Heuristics[0])
+    val game = Game(map) {
+        step(500)
+        actor(Actor("Alice", Position(0, 0), Position(28, 28), Astar(Heu)))
+    }
 
     // Visualization rendering
     val renderer = Renderer(game)
@@ -29,6 +39,7 @@ object Main {
 
     // The window
     val frame = Frame("Villagers")
+
     val stepMode = false
 
     suspend fun run() {
@@ -43,17 +54,7 @@ object Main {
         frame.add(renderer, BorderLayout.CENTER)
         frame.isVisible = true
         renderer.requestFocus()
-        if (stepMode)
-            while (true) {
-                game.pathfinder.step()
-                //println("current: ${game.pathfinder.current}")
-                //println("frontier: ${game.pathfinder.frontier}")
-                renderer.repaint()
-                delay(game.step)
-            }
-        else {
-            game.pathfinder.findPath()
-        }
+
         renderer.repaint()
     }
 }

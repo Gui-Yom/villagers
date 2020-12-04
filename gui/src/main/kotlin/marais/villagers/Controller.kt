@@ -39,9 +39,11 @@ class Controller(private val game: Game, private val renderer: Renderer) {
                     previousPos = pos
 
                     // Paint tiles
-                    // TODO allow painting other tiles
                     if (button == MouseEvent.BUTTON1)
-                        game.map[pos] = Tile.WALL
+                        if (e.isShiftDown)
+                            game.map[pos] = Tile.HARD
+                        else
+                            game.map[pos] = Tile.WALL
                     else if (button == MouseEvent.BUTTON3)
                         game.map[pos] = Tile.EMPTY
 
@@ -102,9 +104,20 @@ class Controller(private val game: Game, private val renderer: Renderer) {
         })
     }
 
-    fun restartSim() {
-        game.pathfinder.restart()
-        //game.pathfinder.findPath()
-        renderer.repaint()
+    fun update(reason: UpdateReason) {
+        when (reason) {
+            UpdateReason.RESTART -> {
+                game.pathfinder.restart()
+                update(UpdateReason.REPAINT)
+            }
+            UpdateReason.REPAINT -> {
+                renderer.repaint()
+            }
+        }
     }
+}
+
+enum class UpdateReason {
+    RESTART,
+    REPAINT
 }

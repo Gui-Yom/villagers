@@ -1,15 +1,5 @@
 package marais.villagers.game
 
-fun Pair<Int, Int>.toPosition() = Position(first, second)
-
-data class Position(val x: Int, val y: Int) {
-    fun toPair() = x to y
-
-    operator fun plus(rhs: Position) = Position(x + rhs.x, y + rhs.y)
-
-    operator fun plus(rhs: Pair<Int, Int>) = Position(x + rhs.first, y + rhs.second)
-}
-
 class GameMap(val width: Int, val height: Int) : Iterable<Position> {
     val inner = Array(width) { Array(height) { Tile.EMPTY } }
 

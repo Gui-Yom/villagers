@@ -4,17 +4,17 @@ import marais.villagers.game.Position
 
 /**
  * Step by step pathfinder to plan a path from start to target.
+ * We need it to maintain a state since we want to be able to step.
+ *
  */
-interface Pathfinder {
-    /**
-     * Runs a search step
-     */
-    fun step()
+abstract class Pathfinder(protected val positionA: () -> Position, protected val goalA: () -> Position) {
 
     /**
-     * @return the path if found or null
+     * the path if found or null
      */
-    val path: List<Position>?
+    var path: List<Position>? = null
+
+    var firstRun = true
 
     /**
      * Has a path been found ?
@@ -23,19 +23,24 @@ interface Pathfinder {
         get() = path != null
 
     /**
-     * Makes the pathfinder restart from a given position on the path
+     * Runs a search step
      */
-    fun restartFrom(pos: Position)
+    abstract fun step()
 
     /**
      * Makes the pathfinder restart from the start.
      */
-    fun restart()
+    open fun reset() {
+        firstRun = true
+        path = null
+    }
 
     /**
      * @return the whole path in one go
      */
-    fun findPath(): List<Position>
+    fun findPath(): List<Position> {
+        while (!found)
+            step()
+        return path!!
+    }
 }
-
-typealias DefaultPathfinder = Astar
